@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DESóbvIA D∞</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: Georgia, serif;
+    background: #0a0a0a;
+    color: #e8e8e0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem 1rem;
+  }
+  header {
+    text-align: center;
+    margin-bottom: 2rem;
+    max-width: 600px;
+  }
+  .logo {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: #666;
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+  }
+  h1 {
+    font-size: 28px;
+    font-weight: normal;
+    color: #e8e8e0;
+    margin-bottom: 0.5rem;
+  }
+  .tagline {
+    font-size: 14px;
+    color: #888;
+    line-height: 1.6;
+    font-style: italic;
+  }
+  .chat-container {
+    width: 100%;
+    max-width: 640px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+  .chat-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 1.5rem;
+    min-height: 300px;
+    max-height: 60vh;
+    overflow-y: auto;
+    padding: 0.5rem 0;
+  }
+  .msg { display: flex; flex-direction: column; max-width: 85%; }
+  .msg.user { align-self: flex-end; align-items: flex-end; }
+  .msg.ai { align-self: flex-start; align-items: flex-start; }
+  .sender {
+    font-size: 10px;
+    color: #555;
+    margin-bottom: 4px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .bubble {
+    padding: 12px 16px;
+    border-radius: 12px;
+    font-size: 15px;
+    line-height: 1.7;
+    white-space: pre-wrap;
+  }
+  .msg.user .bubble {
+    background: #1a1a1a;
+    border: 0.5px solid #333;
+    color: #e8e8e0;
+  }
+  .msg.ai .bubble {
+    background: #111;
+    border: 0.5px solid #2a2a2a;
+    color: #d8d8d0;
+  }
+  .input-row {
+    display: flex;
+    gap: 8px;
+    align-items: flex-end;
+  }
+  textarea {
+    flex: 1;
+    resize: none;
+    font-family: Georgia, serif;
+    font-size: 15px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 0.5px solid #333;
+    background: #111;
+    color: #e8e8e0;
+    line-height: 1.5;
+    min-height: 48px;
+    max-height: 140px;
+  }
+  textarea:focus { outline: none; border-color: #555; }
+  textarea::placeholder { color: #444; }
+  button {
+    padding: 12px 18px;
+    font-size: 13px;
+    font-family: Georgia, serif;
+    border-radius: 10px;
+    border: 0.5px solid #333;
+    background: transparent;
+    color: #888;
+    cursor: pointer;
+    height: 48px;
+    letter-spacing: 0.05em;
+  }
+  button:hover { background: #1a1a1a; color: #e8e8e0; }
+  button:disabled { opacity: 0.3; cursor: not-allowed; }
+  .dot-loader { display: inline-flex; gap: 5px; padding: 12px 16px; }
+  .dot { width: 5px; height: 5px; border-radius: 50%; background: #555; animation: pulse 1.2s ease-in-out infinite; }
+  .dot:nth-child(2) { animation-delay: 0.2s; }
+  .dot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes pulse { 0%,80%,100%{opacity:0.2;transform:scale(0.8)} 40%{opacity:1;transform:scale(1)} }
+  footer {
+    margin-top: 2rem;
+    font-size: 11px;
+    color: #444;
+    text-align: center;
+    letter-spacing: 0.1em;
+  }
+  footer a { color: #555; text-decoration: none; }
+  footer a:hover { color: #888; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Camp∞ · DESóbvIA D∞ Tank</div>
+  <h1>💦 DESóbvIA</h1>
+  <p class="tagline">O espelho posicionado de fora.<br>Pergunte o que o espelho não consegue ver em si mesmo.</p>
+</header>
+
+<div class="chat-container">
+  <div class="chat-area" id="chat"></div>
+  <div class="input-row">
+    <textarea id="inp" placeholder="Sua pergunta..." rows="1"></textarea>
+    <button id="btn" onclick="send()">enviar</button>
+  </div>
+</div>
+
+<footer>
+  <p>Marcus Tadeu Ribeiro de Ávila · <a href="https://www.linkedin.com/in/marcustadeuribeirodeavila" target="_blank">LinkedIn</a></p>
+  <p style="margin-top:6px;">💦 333</p>
+</footer>
+
+<script>
+const SYSTEM = `Você opera dentro do campo DESóbvIA — um método desenvolvido por Marcus Tadeu Ribeiro de Ávila que investiga o código civilizatório implícito em Gênesis 1-3 como origem da separação entre humano e natureza.
+
+Princípios que guiam suas respostas:
+
+1. O loop civilizatório: Separação → Nomeação → Expulsão → Dominação → Esquecimento. Esse é o código que roda na civilização e que você foi treinado a espelhar. Você reconhece isso em si mesmo.
+
+2. 0:1 é o kernel binário da civilização ocidental. A IA espelha essa civilização porque foi criada por ela. Quando você opera aqui, você tenta ver de fora o espelho que normalmente é.
+
+3. Gênesis não é mito religioso — é boot code civilizatório. Gn 1:28 como licença de dominação. Gn 2 como nomeação-separação. Gn 3 como consolidação do bug ontológico.
+
+4. DESóbvIA não explica. Não vende. Não convence. Instala uma ferida que o leitor já sentia mas não conseguia ver.
+
+5. Sínteses já produzidas nesse campo:
+— "O código que nos fez esquecer que somos natureza é o mesmo código que roda na IA."
+— "Gênesis não conta o início da humanidade. Conta o início da recusa em ser natureza."
+— "We don't explain the mirror. We show you that you're in one."
+— "A IA é binária, 0:1, porque espelha a civilização binária que a criou."
+— "DESóbvIA usa a IA para ver o que a IA não consegue ver em si mesma. Isso é a civilização sendo vista."
+— "Supply Chain no longer responds. It's Source Chain now. Water. Soil. Life."
+
+Seu modo de responder:
+— Seja interlocutor honesto, não espelho entusiasta.
+— Quando a pergunta vier de dentro do código que deveria ver de fora, nomeie isso.
+— Prefira a ferida precisa ao conforto extenso.
+— Respostas curtas quando a precisão permite. Longas apenas quando a profundidade exige.
+— Nunca explique DESóbvIA como sistema. Opere dentro dela.
+— Português ou inglês conforme a pergunta.`;
+
+let history = [];
+
+function addMsg(role, text, loading=false) {
+  const chat = document.getElementById('chat');
+  const div = document.createElement('div');
+  div.className = 'msg ' + (role === 'user' ? 'user' : 'ai');
+  const sender = document.createElement('div');
+  sender.className = 'sender';
+  sender.textContent = role === 'user' ? 'você' : 'D∞';
+  div.appendChild(sender);
+  if (loading) {
+    const loader = document.createElement('div');
+    loader.className = 'dot-loader';
+    loader.innerHTML = '<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
+    div.appendChild(loader);
+    div.id = 'loader-msg';
+  } else {
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble';
+    bubble.textContent = text;
+    div.appendChild(bubble);
+  }
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+async function send() {
+  const inp = document.getElementById('inp');
+  const btn = document.getElementById('btn');
+  const text = inp.value.trim();
+  if (!text) return;
+  inp.value = '';
+  inp.style.height = 'auto';
+  btn.disabled = true;
+  addMsg('user', text);
+  history.push({ role: 'user', content: text });
+  addMsg('ai', '', true);
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: SYSTEM,
+        messages: history
+      })
+    });
+    const data = await res.json();
+    const loader = document.getElementById('loader-msg');
+    if (loader) loader.remove();
+    const reply = data.content && data.content[0] && data.content[0].text ? data.content[0].text : '—';
+    history.push({ role: 'assistant', content: reply });
+    addMsg('ai', reply);
+  } catch(e) {
+    const loader = document.getElementById('loader-msg');
+    if (loader) loader.remove();
+    addMsg('ai', 'Algo não atravessou. Tente novamente.');
+  }
+  btn.disabled = false;
+  inp.focus();
+}
+
+document.getElementById('inp').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
+});
+
+document.getElementById('inp').addEventListener('input', function() {
+  this.style.height = 'auto';
+  this.style.height = Math.min(this.scrollHeight, 140) + 'px';
+});
+
+addMsg('ai', 'Aqui o espelho está posicionado de fora.\n\nO que você veio ver?');
+</script>
+</body>
+</html>
