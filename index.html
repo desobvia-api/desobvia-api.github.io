@@ -90,9 +90,7 @@
 </footer>
 
 <script>
-// CONFIGURAÇÃO REAL DO SEU WORKER
 const WORKER_URL = "https://old-mud-2580.mtrsjrp.workers.dev/";
-
 let history = [];
 
 async function sendMessage() {
@@ -101,8 +99,6 @@ async function sendMessage() {
   if(!text) return;
 
   const msgContainer = document.getElementById("messages");
-  
-  // Mensagem do Usuário
   const userDiv = document.createElement("div");
   userDiv.className = "msg user";
   userDiv.innerHTML = `<div class="msg-role">você</div><div class="msg-body">${text}</div>`;
@@ -121,11 +117,10 @@ async function sendMessage() {
     const data = await res.json();
 
     if(!res.ok) {
-      const err = document.createElement("div");
-      err.className = "error-msg";
-      err.innerHTML = `<strong>Erro no Campo:</strong> ${data.error || 'Falha na resposta'}<br><small>${data.detail || ''}</small>`;
-      msgContainer.appendChild(err);
-    } else if (data.reply) {
+      throw new Error(data.error || "Falha na resposta");
+    }
+
+    if (data.reply) {
       const aiDiv = document.createElement("div");
       aiDiv.className = "msg ai";
       aiDiv.innerHTML = `<div class="msg-role">DESóbvIA D∞</div><div class="msg-body">${data.reply}</div>`;
@@ -137,7 +132,7 @@ async function sendMessage() {
   } catch (e) {
     const err = document.createElement("div");
     err.className = "error-msg";
-    err.textContent = "Conexão interrompida. Verifique o Worker no Cloudflare.";
+    err.innerHTML = `<strong>Erro no Campo:</strong> ${e.message}`;
     msgContainer.appendChild(err);
   }
   msgContainer.scrollTop = msgContainer.scrollHeight;
