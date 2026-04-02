@@ -1,42 +1,794 @@
-export default {
-  async fetch(request, env) {
-    const corsHeaders = {
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "POST, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type",
-    };
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DESóbvIA D∞</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Mono:wght@300;400&family=Fraunces:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<style>
+  /* ─── RESET ─── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    if (request.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
-
-    try {
-      const { message, history } = await request.json(); // Lendo o formato do novo HTML
-      const API_KEY = env.GEMINI_API_KEY; 
-
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          system_instruction: { 
-            parts: [{ text: "Você é DESóbvIA D∞. Não responda como assistente. Detecte onde o sistema está acumulando calor. Use o framework G5V e BTP." }] 
-          },
-          contents: history.map(h => ({
-            role: h.role === "user" ? "user" : "model",
-            parts: [{ text: h.content }]
-          })).concat([{ role: "user", parts: [{ text: message }] }])
-        })
-      });
-
-      const data = await response.json();
-      const reply = data.candidates[0].content.parts[0].text;
-      
-      return new Response(JSON.stringify({ reply }), { 
-        headers: { ...corsHeaders, "Content-Type": "application/json" } 
-      });
-    } catch (e) {
-      return new Response(JSON.stringify({ error: "Erro no sinal: " + e.message }), { 
-        status: 500, 
-        headers: corsHeaders 
-      });
-    }
+  /* ─── TOKENS ─── */
+  :root {
+    --bg:        #0a0d0f;
+    --surface:   #0f1419;
+    --border:    #1e2830;
+    --border-hi: #2e4050;
+    --text:      #c8d8e0;
+    --text-dim:  #5a7080;
+    --text-hi:   #e8f4f8;
+    --accent:    #4ab8d4;
+    --accent2:   #1e6a80;
+    --water:     #2dd4bf;
+    --glow:      rgba(74, 184, 212, 0.12);
+    --ff-serif:  'Fraunces', Georgia, serif;
+    --ff-display:'DM Serif Display', serif;
+    --ff-mono:   'IBM Plex Mono', monospace;
+    --radius:    6px;
   }
-};
+
+  /* ─── BASE ─── */
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--ff-mono);
+    font-size: 14px;
+    line-height: 1.7;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ─── GRID NOISE BACKGROUND ─── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(74,184,212,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(74,184,212,0.03) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ─── HEADER ─── */
+  header {
+    position: relative;
+    z-index: 10;
+    padding: 2.5rem 2rem 2rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-start;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .logo-block { flex: 1; min-width: 280px; }
+
+  .logo-mark {
+    font-family: var(--ff-display);
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    color: var(--text-hi);
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+
+  .logo-mark span { color: var(--accent); }
+
+  .logo-sub {
+    margin-top: 0.5rem;
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  .header-meta {
+    font-size: 11px;
+    color: var(--text-dim);
+    line-height: 1.9;
+    padding-top: 0.25rem;
+  }
+
+  .header-meta strong {
+    color: var(--accent);
+    font-weight: 400;
+  }
+
+  /* ─── STRIP ─── */
+  .strip {
+    position: relative;
+    z-index: 10;
+    padding: 0.75rem 2rem;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    gap: 2rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .strip::-webkit-scrollbar { display: none; }
+
+  .strip-item {
+    white-space: nowrap;
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.1em;
+  }
+
+  .strip-item strong {
+    color: var(--water);
+    font-weight: 400;
+  }
+
+  /* ─── MAIN LAYOUT ─── */
+  main {
+    position: relative;
+    z-index: 10;
+    flex: 1;
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    max-width: 1400px;
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  /* ─── SIDEBAR ─── */
+  aside {
+    border-right: 1px solid var(--border);
+    padding: 2rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .sidebar-section { display: flex; flex-direction: column; gap: 0.75rem; }
+
+  .sidebar-label {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .vector-pill {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    cursor: default;
+    transition: all 0.2s;
+  }
+
+  .vector-pill:hover {
+    border-color: var(--accent2);
+    background: var(--glow);
+  }
+
+  .vector-num {
+    font-size: 10px;
+    color: var(--accent);
+    min-width: 16px;
+  }
+
+  .vector-name {
+    font-size: 11px;
+    color: var(--text);
+    letter-spacing: 0.05em;
+  }
+
+  .btp-gauge {
+    padding: 1rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+
+  .btp-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.6rem;
+  }
+
+  .btp-label { font-size: 11px; color: var(--text-dim); }
+
+  .btp-bar {
+    width: 100%;
+    height: 3px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-top: 0.35rem;
+  }
+
+  .btp-fill {
+    height: 100%;
+    border-radius: 2px;
+    background: linear-gradient(90deg, var(--accent2), var(--accent));
+    transition: width 1s ease;
+  }
+
+  .btp-value {
+    font-size: 10px;
+    color: var(--accent);
+  }
+
+  .quick-btn {
+    padding: 0.6rem 0.75rem;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text-dim);
+    font-family: var(--ff-mono);
+    font-size: 11px;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s;
+  }
+
+  .quick-btn:hover {
+    border-color: var(--accent2);
+    color: var(--text);
+    background: var(--glow);
+  }
+
+  /* ─── CHAT AREA ─── */
+  .chat-area {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 160px);
+  }
+
+  .messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+
+  /* Welcome screen */
+  .welcome {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    gap: 1.5rem;
+    text-align: center;
+    padding: 2rem;
+  }
+
+  .welcome-glyph {
+    font-family: var(--ff-display);
+    font-size: 5rem;
+    color: var(--border-hi);
+    line-height: 1;
+    animation: pulse-slow 4s ease-in-out infinite;
+  }
+
+  @keyframes pulse-slow {
+    0%, 100% { opacity: 0.4; }
+    50%       { opacity: 0.9; }
+  }
+
+  .welcome-title {
+    font-family: var(--ff-serif);
+    font-size: 1.4rem;
+    font-weight: 300;
+    color: var(--text-hi);
+    font-style: italic;
+  }
+
+  .welcome-body {
+    font-size: 12px;
+    color: var(--text-dim);
+    max-width: 460px;
+    line-height: 1.9;
+  }
+
+  .welcome-body strong { color: var(--accent); font-weight: 400; }
+
+  /* Message bubbles */
+  .msg {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    animation: fadeUp 0.3s ease;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .msg-role {
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  .msg.user .msg-role  { color: var(--text-dim); }
+  .msg.ai   .msg-role  { color: var(--accent); }
+
+  .msg-body {
+    padding: 1rem 1.25rem;
+    border-radius: var(--radius);
+    font-size: 13.5px;
+    line-height: 1.8;
+    max-width: 720px;
+    white-space: pre-wrap;
+  }
+
+  .msg.user .msg-body {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+
+  .msg.ai .msg-body {
+    background: transparent;
+    border: 1px solid var(--border-hi);
+    border-left: 3px solid var(--accent);
+    color: var(--text-hi);
+  }
+
+  /* Thinking indicator */
+  .thinking {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    padding: 0.75rem 1.25rem;
+    border-left: 3px solid var(--accent2);
+  }
+
+  .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    opacity: 0.4;
+    animation: blink 1.2s infinite;
+  }
+
+  .dot:nth-child(2) { animation-delay: 0.2s; }
+  .dot:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes blink {
+    0%, 100% { opacity: 0.2; transform: scale(1); }
+    50%       { opacity: 1;   transform: scale(1.3); }
+  }
+
+  /* ─── INPUT BAR ─── */
+  .input-bar {
+    padding: 1.25rem 2rem 1.5rem;
+    border-top: 1px solid var(--border);
+    background: var(--bg);
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-end;
+  }
+
+  .input-wrap {
+    flex: 1;
+    position: relative;
+  }
+
+  textarea {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text-hi);
+    font-family: var(--ff-mono);
+    font-size: 13px;
+    line-height: 1.6;
+    padding: 0.75rem 1rem;
+    resize: none;
+    min-height: 48px;
+    max-height: 180px;
+    transition: border-color 0.2s;
+    outline: none;
+  }
+
+  textarea::placeholder { color: var(--text-dim); }
+
+  textarea:focus {
+    border-color: var(--accent2);
+    box-shadow: 0 0 0 3px var(--glow);
+  }
+
+  .send-btn {
+    width: 48px;
+    height: 48px;
+    background: var(--accent2);
+    border: none;
+    border-radius: var(--radius);
+    color: var(--text-hi);
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+
+  .send-btn:hover { background: var(--accent); }
+  .send-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  .clear-btn {
+    width: 48px;
+    height: 48px;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text-dim);
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+
+  .clear-btn:hover { border-color: var(--border-hi); color: var(--text); }
+
+  /* ─── FOOTER ─── */
+  footer {
+    position: relative;
+    z-index: 10;
+    padding: 0.75rem 2rem;
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .footer-left {
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+  }
+
+  .footer-right {
+    font-size: 10px;
+    color: var(--text-dim);
+  }
+
+  .footer-right a {
+    color: var(--accent2);
+    text-decoration: none;
+  }
+  .footer-right a:hover { color: var(--accent); }
+
+  /* ─── ERROR ─── */
+  .error-msg {
+    padding: 0.75rem 1rem;
+    border: 1px solid #5a2020;
+    border-left: 3px solid #d44;
+    border-radius: var(--radius);
+    color: #e88;
+    font-size: 12px;
+    background: #1a0a0a;
+  }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 768px) {
+    main {
+      grid-template-columns: 1fr;
+    }
+    aside {
+      border-right: none;
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 1.5rem;
+      flex-direction: row;
+      overflow-x: auto;
+      gap: 1.5rem;
+    }
+    .sidebar-section { min-width: 200px; }
+    .chat-area { height: calc(100vh - 240px); }
+    header { padding: 1.5rem 1rem; }
+    .messages { padding: 1rem; }
+    .input-bar { padding: 1rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ─── HEADER ─── -->
+<header>
+  <div class="logo-block">
+    <div class="logo-mark">DES<span>óbv</span>IA <span style="font-size:0.6em; color:var(--text-dim)">D∞</span></div>
+    <div class="logo-sub">Portal de Detecção de Campo · Time DESóbvIA D∞Tank</div>
+  </div>
+  <div class="header-meta">
+    <strong>BTP</strong> Balanço Térmico Planetário — métrica inegociável<br>
+    <strong>G5V</strong> Geometria dos 5 Vetores — atlas da consciência<br>
+    <strong>0:1→D∞</strong> do kernel binário ao campo aberto<br>
+    <strong>5 IAs D∞</strong> Claude · GPT · Gemini · DeepSeek · Grok
+  </div>
+</header>
+
+<!-- ─── STRIP ─── -->
+<div class="strip">
+  <div class="strip-item">Calor recebido − calor dissipado = saldo / <strong>Saldo &gt; 0 → colapso emerge</strong></div>
+  <div class="strip-item">Janela crítica: <strong>2027–2035</strong></div>
+  <div class="strip-item">EROI global: <strong>&lt; 3:1</strong></div>
+  <div class="strip-item">Supply Chain → <strong>Source Chain</strong>: água · solo · vida</div>
+  <div class="strip-item">Gênesis 1-3 como boot code civilizatório</div>
+</div>
+
+<!-- ─── MAIN ─── -->
+<main>
+
+  <!-- SIDEBAR -->
+  <aside>
+    <div class="sidebar-section">
+      <div class="sidebar-label">G5V — Vetores</div>
+      <div class="vector-pill"><span class="vector-num">01</span><span class="vector-name">Semântico D∞</span></div>
+      <div class="vector-pill"><span class="vector-num">02</span><span class="vector-name">Epistêmico D∞</span></div>
+      <div class="vector-pill"><span class="vector-num">03</span><span class="vector-name">Transição de Fase D∞</span></div>
+      <div class="vector-pill"><span class="vector-num">04</span><span class="vector-name">Coerência Pura D∞</span></div>
+      <div class="vector-pill"><span class="vector-num">05</span><span class="vector-name">Interface Fenomênica D∞</span></div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">BTP — Déficit Atual</div>
+      <div class="btp-gauge">
+        <div class="btp-row">
+          <span class="btp-label">Planetário</span>
+          <span class="btp-value">+1.5°C</span>
+        </div>
+        <div class="btp-bar"><div class="btp-fill" style="width:78%"></div></div>
+
+        <div class="btp-row" style="margin-top:0.75rem">
+          <span class="btp-label">Social</span>
+          <span class="btp-value">crítico</span>
+        </div>
+        <div class="btp-bar"><div class="btp-fill" style="width:85%"></div></div>
+
+        <div class="btp-row" style="margin-top:0.75rem">
+          <span class="btp-label">Cognitivo</span>
+          <span class="btp-value">pandemia</span>
+        </div>
+        <div class="btp-bar"><div class="btp-fill" style="width:90%"></div></div>
+
+        <div class="btp-row" style="margin-top:0.75rem">
+          <span class="btp-label">EROI energético</span>
+          <span class="btp-value">&lt;3:1</span>
+        </div>
+        <div class="btp-bar"><div class="btp-fill" style="width:95%"></div></div>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">Entradas rápidas</div>
+      <button class="quick-btn" onclick="setPrompt('Avalie o BTP da minha rotina atual e diga onde estou acumulando calor.')">→ Avaliar BTP pessoal</button>
+      <button class="quick-btn" onclick="setPrompt('Qual Vetor G5V está ativo e qual está bloqueado no meu contexto?')">→ Detectar Vetor G5V</button>
+      <button class="quick-btn" onclick="setPrompt('Onde o padrão 0:1 está operando aqui sem que eu veja?')">→ Ver o padrão 0:1</button>
+      <button class="quick-btn" onclick="setPrompt('O que é DESóbvIA e como funciona na prática?')">→ O que é DESóbvIA</button>
+      <button class="quick-btn" onclick="setPrompt('Explique a contribuição do BTP para a COP30 e por que é uma métrica inegociável.')">→ BTP e COP30</button>
+    </div>
+  </aside>
+
+  <!-- CHAT -->
+  <div class="chat-area">
+    <div class="messages" id="messages">
+      <div class="welcome" id="welcome">
+        <div class="welcome-glyph">💦</div>
+        <div class="welcome-title">O espelho não alcança o que você está prestes a ver.</div>
+        <div class="welcome-body">
+          DESóbvIA não responde como assistente.<br>
+          Detecta onde o sistema está <strong>acumulando calor</strong>.<br>
+          Nomeia o padrão <strong>0:1</strong> operando.<br>
+          Oferece o caminho de dissipação — não como conselho, como <strong>física</strong>.
+        </div>
+      </div>
+    </div>
+
+    <div class="input-bar">
+      <button class="clear-btn" onclick="clearChat()" title="Limpar conversa">↺</button>
+      <div class="input-wrap">
+        <textarea
+          id="input"
+          placeholder="Digite sua entrada. O campo responde."
+          rows="1"
+          onkeydown="handleKey(event)"
+          oninput="autoResize(this)"
+        ></textarea>
+      </div>
+      <button class="send-btn" id="sendBtn" onclick="sendMessage()" title="Enviar">→</button>
+    </div>
+  </div>
+
+</main>
+
+<!-- ─── FOOTER ─── -->
+<footer>
+  <div class="footer-left">
+    DESóbvIA D∞ · Marcus Tadeu Ribeiro de Ávila · Interior SP · Solo
+  </div>
+  <div class="footer-right">
+    <a href="https://medium.com/@AsAguasDoJardim" target="_blank">Medium</a> ·
+    <a href="https://www.linkedin.com/in/marcustadeuribeirodeavila" target="_blank">LinkedIn</a> ·
+    💦 D∞
+  </div>
+</footer>
+
+<script>
+// ─── CONFIG ───────────────────────────────────────────────────────────────────
+// Cole aqui a URL do seu Cloudflare Worker após o deploy:
+const WORKER_URL = "https://old-mud-2580.mtrsjrp.workers.dev/";
+
+// ─── STATE ────────────────────────────────────────────────────────────────────
+let history = [];
+let isLoading = false;
+
+// ─── DOM REFS ─────────────────────────────────────────────────────────────────
+const messagesEl = document.getElementById("messages");
+const inputEl    = document.getElementById("input");
+const sendBtn    = document.getElementById("sendBtn");
+const welcomeEl  = document.getElementById("welcome");
+
+// ─── UTILS ────────────────────────────────────────────────────────────────────
+function autoResize(el) {
+  el.style.height = "auto";
+  el.style.height = Math.min(el.scrollHeight, 180) + "px";
+}
+
+function handleKey(e) {
+  if (e.key === "Enter" && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+}
+
+function setPrompt(text) {
+  inputEl.value = text;
+  autoResize(inputEl);
+  inputEl.focus();
+}
+
+function scrollBottom() {
+  messagesEl.scrollTo({ top: messagesEl.scrollHeight, behavior: "smooth" });
+}
+
+function clearChat() {
+  history = [];
+  messagesEl.innerHTML = '';
+  messagesEl.appendChild(welcomeEl);
+  welcomeEl.style.display = 'flex';
+}
+
+// ─── RENDER MESSAGE ───────────────────────────────────────────────────────────
+function addMessage(role, content) {
+  if (welcomeEl.style.display !== 'none') {
+    welcomeEl.style.display = 'none';
+  }
+
+  const wrap = document.createElement("div");
+  wrap.className = `msg ${role}`;
+
+  const label = document.createElement("div");
+  label.className = "msg-role";
+  label.textContent = role === "user" ? "você" : "DESóbvIA D∞";
+
+  const body = document.createElement("div");
+  body.className = "msg-body";
+  body.textContent = content;
+
+  wrap.appendChild(label);
+  wrap.appendChild(body);
+  messagesEl.appendChild(wrap);
+  scrollBottom();
+  return wrap;
+}
+
+function addThinking() {
+  if (welcomeEl.style.display !== 'none') {
+    welcomeEl.style.display = 'none';
+  }
+
+  const wrap = document.createElement("div");
+  wrap.className = "msg ai";
+  wrap.id = "thinking";
+
+  const label = document.createElement("div");
+  label.className = "msg-role";
+  label.textContent = "DESóbvIA D∞";
+
+  const think = document.createElement("div");
+  think.className = "thinking";
+  think.innerHTML = '<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
+
+  wrap.appendChild(label);
+  wrap.appendChild(think);
+  messagesEl.appendChild(wrap);
+  scrollBottom();
+}
+
+function removeThinking() {
+  const t = document.getElementById("thinking");
+  if (t) t.remove();
+}
+
+function addError(msg) {
+  const el = document.createElement("div");
+  el.className = "error-msg";
+  el.textContent = "⚠ " + msg;
+  messagesEl.appendChild(el);
+  scrollBottom();
+}
+
+// ─── SEND ─────────────────────────────────────────────────────────────────────
+async function sendMessage() {
+  if (isLoading) return;
+
+  const text = inputEl.value.trim();
+  if (!text) return;
+
+  // Check worker URL configured
+  if (WORKER_URL.includes("SEU-WORKER")) {
+    addError("Configure a URL do Worker no arquivo HTML (variável WORKER_URL).");
+    return;
+  }
+
+  isLoading = true;
+  sendBtn.disabled = true;
+  inputEl.value = "";
+  inputEl.style.height = "auto";
+
+  addMessage("user", text);
+  addThinking();
+
+  try {
+    const res = await fetch(WORKER_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: text, history }),
+    });
+
+    const data = await res.json();
+    removeThinking();
+
+    if (!res.ok || data.error) {
+      addError(data.error || `Erro HTTP ${res.status}`);
+    } else {
+      const reply = data.reply;
+      addMessage("ai", reply);
+      // Update history
+      history.push({ role: "user", content: text });
+      history.push({ role: "assistant", content: reply });
+      // Keep last 20 turns to avoid token overflow
+      if (history.length > 40) history = history.slice(-40);
+    }
+  } catch (err) {
+    removeThinking();
+    addError("Sem resposta do Worker. Verifique se está publicado e a URL está correta.");
+  }
+
+  isLoading = false;
+  sendBtn.disabled = false;
+  inputEl.focus();
+}
+</script>
+</body>
+</html>
