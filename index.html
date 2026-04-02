@@ -86,11 +86,11 @@
 
 <footer>
   <div>DESóbvIA D∞ · Interior SP</div>
-  <div><a href="https://www.linkedin.com/in/marcustadeuribeirodeavila" style="color:var(--accent2)">LinkedIn</a> · 💦 D∞</div>
+  <div><a href="https://www.linkedin.com/in/marcustadeuribeirodeavila" target="_blank" style="color:var(--accent2)">LinkedIn</a> · 💦 D∞</div>
 </footer>
 
 <script>
-// URL DO SEU WORKER (EXTRAÍDA DO SEU PRINT)
+// CONFIGURAÇÃO REAL DO SEU WORKER
 const WORKER_URL = "https://old-mud-2580.mtrsjrp.workers.dev/";
 
 let history = [];
@@ -125,20 +125,19 @@ async function sendMessage() {
       err.className = "error-msg";
       err.innerHTML = `<strong>Erro no Campo:</strong> ${data.error || 'Falha na resposta'}<br><small>${data.detail || ''}</small>`;
       msgContainer.appendChild(err);
-    } else {
+    } else if (data.reply) {
       const aiDiv = document.createElement("div");
       aiDiv.className = "msg ai";
       aiDiv.innerHTML = `<div class="msg-role">DESóbvIA D∞</div><div class="msg-body">${data.reply}</div>`;
       msgContainer.appendChild(aiDiv);
       
-      // Atualiza histórico para manter o contexto
       history.push({role: "user", content: text}, {role: "assistant", content: data.reply});
       if(history.length > 20) history = history.slice(-20);
     }
   } catch (e) {
     const err = document.createElement("div");
     err.className = "error-msg";
-    err.textContent = "Conexão interrompida. Verifique se o Worker está publicado.";
+    err.textContent = "Conexão interrompida. Verifique o Worker no Cloudflare.";
     msgContainer.appendChild(err);
   }
   msgContainer.scrollTop = msgContainer.scrollHeight;
