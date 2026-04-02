@@ -16,215 +16,132 @@
     --radius: 6px;
   }
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  html { scroll-behavior: smooth; }
-  body { background: var(--bg); color: var(--text); font-family: var(--ff-mono); font-size: 14px; line-height: 1.7; min-height: 100vh; display: flex; flex-direction: column; }
+  body { background: var(--bg); color: var(--text); font-family: var(--ff-mono); font-size: 14px; line-height: 1.7; min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
   body::before { content: ''; position: fixed; inset: 0; background-image: linear-gradient(rgba(74,184,212,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(74,184,212,0.03) 1px, transparent 1px); background-size: 48px 48px; pointer-events: none; z-index: 0; }
-  header { position: relative; z-index: 10; padding: 2.5rem 2rem 2rem; border-bottom: 1px solid var(--border); display: flex; align-items: flex-start; gap: 2rem; flex-wrap: wrap; }
+  header { position: relative; z-index: 10; padding: 2rem; border-bottom: 1px solid var(--border); display: flex; align-items: flex-start; gap: 2rem; flex-wrap: wrap; }
   .logo-block { flex: 1; min-width: 280px; }
-  .logo-mark { font-family: var(--ff-display); font-size: clamp(2rem, 5vw, 3.5rem); color: var(--text-hi); letter-spacing: -0.02em; line-height: 1; }
+  .logo-mark { font-family: var(--ff-display); font-size: clamp(2rem, 5vw, 3rem); color: var(--text-hi); letter-spacing: -0.02em; line-height: 1; }
   .logo-mark span { color: var(--accent); }
   .logo-sub { margin-top: 0.5rem; font-size: 11px; color: var(--text-dim); letter-spacing: 0.15em; text-transform: uppercase; }
-  .header-meta { font-size: 11px; color: var(--text-dim); line-height: 1.9; padding-top: 0.25rem; }
-  .header-meta strong { color: var(--accent); font-weight: 400; }
-  .strip { position: relative; z-index: 10; padding: 0.75rem 2rem; background: var(--surface); border-bottom: 1px solid var(--border); display: flex; gap: 2rem; overflow-x: auto; scrollbar-width: none; }
-  .strip-item { white-space: nowrap; font-size: 11px; color: var(--text-dim); letter-spacing: 0.1em; }
-  .strip-item strong { color: var(--water); font-weight: 400; }
+  .strip { position: relative; z-index: 10; padding: 0.75rem 2rem; background: var(--surface); border-bottom: 1px solid var(--border); display: flex; gap: 2rem; overflow-x: auto; white-space: nowrap; font-size: 11px; color: var(--text-dim); }
   main { position: relative; z-index: 10; flex: 1; display: grid; grid-template-columns: 300px 1fr; max-width: 1400px; width: 100%; margin: 0 auto; }
   aside { border-right: 1px solid var(--border); padding: 2rem 1.5rem; display: flex; flex-direction: column; gap: 2rem; }
-  .sidebar-section { display: flex; flex-direction: column; gap: 0.75rem; }
-  .sidebar-label { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-dim); padding-bottom: 0.5rem; border-bottom: 1px solid var(--border); }
-  .vector-pill { display: flex; align-items: center; gap: 0.6rem; padding: 0.5rem 0.75rem; border: 1px solid var(--border); border-radius: var(--radius); transition: all 0.2s; }
-  .vector-num { font-size: 10px; color: var(--accent); min-width: 16px; }
-  .vector-name { font-size: 11px; color: var(--text); letter-spacing: 0.05em; }
-  .btp-gauge { padding: 1rem; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
-  .btp-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem; }
-  .btp-label { font-size: 11px; color: var(--text-dim); }
-  .btp-bar { width: 100%; height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; margin-top: 0.35rem; }
-  .btp-fill { height: 100%; border-radius: 2px; background: linear-gradient(90deg, var(--accent2), var(--accent)); transition: width 1s ease; }
-  .btp-value { font-size: 10px; color: var(--accent); }
-  .quick-btn { padding: 0.6rem 0.75rem; background: transparent; border: 1px solid var(--border); border-radius: var(--radius); color: var(--text-dim); font-family: var(--ff-mono); font-size: 11px; cursor: pointer; text-align: left; transition: all 0.2s; }
-  .quick-btn:hover { border-color: var(--accent2); color: var(--text); background: var(--glow); }
-  .chat-area { display: flex; flex-direction: column; height: calc(100vh - 160px); }
+  .sidebar-label { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-dim); border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; margin-bottom: 0.5rem; }
+  .vector-pill { display: flex; align-items: center; gap: 0.6rem; padding: 0.5rem; border: 1px solid var(--border); border-radius: 4px; margin-bottom: 0.5rem; font-size: 11px; }
+  .btp-gauge { padding: 1rem; background: var(--surface); border: 1px solid var(--border); border-radius: 4px; margin-bottom: 1rem; }
+  .btp-bar { height: 3px; background: var(--border); margin-top: 5px; border-radius: 2px; overflow: hidden; }
+  .btp-fill { height: 100%; background: var(--accent); transition: width 1s; }
+  .chat-area { display: flex; flex-direction: column; height: calc(100vh - 200px); }
   .messages { flex: 1; overflow-y: auto; padding: 2rem; display: flex; flex-direction: column; gap: 1.5rem; }
-  .welcome { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; gap: 1.5rem; text-align: center; }
-  .welcome-glyph { font-family: var(--ff-display); font-size: 5rem; color: var(--border-hi); animation: pulse-slow 4s infinite; }
-  @keyframes pulse-slow { 0%, 100% { opacity: 0.4; } 50% { opacity: 0.9; } }
-  .welcome-title { font-family: var(--ff-serif); font-size: 1.4rem; color: var(--text-hi); font-style: italic; }
-  .welcome-body { font-size: 12px; color: var(--text-dim); max-width: 460px; line-height: 1.9; }
-  .msg { display: flex; flex-direction: column; gap: 0.35rem; animation: fadeUp 0.3s ease; }
-  @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-  .msg-role { font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; }
-  .msg.user .msg-role { color: var(--text-dim); }
+  .msg { animation: fade 0.3s ease; display: flex; flex-direction: column; gap: 5px; }
+  @keyframes fade { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  .msg-role { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-dim); }
   .msg.ai .msg-role { color: var(--accent); }
-  .msg-body { padding: 1rem 1.25rem; border-radius: var(--radius); font-size: 13.5px; line-height: 1.8; max-width: 720px; white-space: pre-wrap; }
-  .msg.user .msg-body { background: var(--surface); border: 1px solid var(--border); color: var(--text); }
-  .msg.ai .msg-body { background: transparent; border: 1px solid var(--border-hi); border-left: 3px solid var(--accent); color: var(--text-hi); }
-  .thinking { display: flex; gap: 6px; padding: 0.75rem 1.25rem; }
-  .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: blink 1.2s infinite; }
-  .dot:nth-child(2) { animation-delay: 0.2s; }
-  .dot:nth-child(3) { animation-delay: 0.4s; }
-  @keyframes blink { 0%, 100% { opacity: 0.2; } 50% { opacity: 1; } }
-  .input-bar { padding: 1.25rem 2rem 1.5rem; border-top: 1px solid var(--border); background: var(--bg); display: flex; gap: 0.75rem; align-items: flex-end; }
-  .input-wrap { flex: 1; position: relative; }
-  textarea { width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text-hi); font-family: var(--ff-mono); font-size: 13px; padding: 0.75rem 1rem; resize: none; min-height: 48px; max-height: 180px; outline: none; }
-  .send-btn { width: 48px; height: 48px; background: var(--accent2); border: none; border-radius: var(--radius); color: var(--text-hi); font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
-  .send-btn:hover { background: var(--accent); }
-  .clear-btn { width: 48px; height: 48px; background: transparent; border: 1px solid var(--border); border-radius: var(--radius); color: var(--text-dim); cursor: pointer; display: flex; align-items: center; justify-content: center; }
-  footer { padding: 0.75rem 2rem; border-top: 1px solid var(--border); background: var(--surface); display: flex; justify-content: space-between; align-items: center; font-size: 10px; color: var(--text-dim); }
-  a { color: var(--accent2); text-decoration: none; }
-  .error-msg { padding: 0.75rem 1rem; border-left: 3px solid #d44; color: #e88; font-size: 12px; background: #1a0a0a; margin: 10px; }
-  @media (max-width: 768px) { main { grid-template-columns: 1fr; } aside { border-right: none; border-bottom: 1px solid var(--border); flex-direction: row; overflow-x: auto; } .chat-area { height: auto; } }
+  .msg-body { padding: 1rem; border-radius: 6px; background: var(--surface); border: 1px solid var(--border); font-size: 14px; max-width: 85%; white-space: pre-wrap; }
+  .msg.ai .msg-body { background: transparent; border-left: 3px solid var(--accent); color: var(--text-hi); }
+  .input-bar { padding: 1.5rem 2rem; border-top: 1px solid var(--border); display: flex; gap: 1rem; }
+  textarea { flex: 1; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; color: var(--text-hi); padding: 12px; resize: none; font-family: var(--ff-mono); outline: none; min-height: 50px; }
+  .send-btn { width: 50px; height: 50px; background: var(--accent2); border: none; border-radius: 6px; color: white; cursor: pointer; font-size: 20px; }
+  .error-msg { background: #2a1010; color: #ff8888; padding: 1rem; border-radius: 6px; border-left: 4px solid #cc4444; margin: 1rem; font-size: 12px; }
+  footer { padding: 1rem 2rem; font-size: 10px; color: var(--text-dim); border-top: 1px solid var(--border); display: flex; justify-content: space-between; }
+  @media (max-width: 768px) { main { grid-template-columns: 1fr; } aside { display: none; } }
 </style>
 </head>
 <body>
 
 <header>
   <div class="logo-block">
-    <div class="logo-mark">DES<span>óbv</span>IA <span style="font-size:0.6em; color:var(--text-dim)">D∞</span></div>
-    <div class="logo-sub">Portal de Detecção de Campo · Time DESóbvIA D∞Tank</div>
-  </div>
-  <div class="header-meta">
-    <strong>BTP</strong> Balanço Térmico Planetário<br>
-    <strong>G5V</strong> Geometria dos 5 Vetores<br>
-    <strong>0:1→D∞</strong> Kernel Binário ao Campo
+    <div class="logo-mark">DES<span>óbv</span>IA <span>D∞</span></div>
+    <div class="logo-sub">Portal de Detecção de Campo · Marcus Tadeu</div>
   </div>
 </header>
 
 <div class="strip">
-  <div class="strip-item">Calor recebido − dissipado = saldo / <strong>Saldo > 0 → colapso</strong></div>
-  <div class="strip-item">Janela crítica: <strong>2027–2035</strong></div>
-  <div class="strip-item">Supply Chain → <strong>Source Chain</strong></div>
+  Calor recebido − dissipado = saldo / Saldo > 0 → colapso / Janela: 2027–2035 / EROI < 3:1
 </div>
 
 <main>
   <aside>
-    <div class="sidebar-section">
-      <div class="sidebar-label">G5V — Vetores</div>
-      <div class="vector-pill"><span class="vector-num">01</span><span class="vector-name">Semântico D∞</span></div>
-      <div class="vector-pill"><span class="vector-num">02</span><span class="vector-name">Epistêmico D∞</span></div>
-      <div class="vector-pill"><span class="vector-num">03</span><span class="vector-name">Transição de Fase</span></div>
+    <div class="sidebar-label">BTP — Status</div>
+    <div class="btp-gauge">
+      <div style="display:flex; justify-content:space-between; font-size:11px"><span>Planetário</span><span>+1.5°C</span></div>
+      <div class="btp-bar"><div class="btp-fill" style="width:78%"></div></div>
     </div>
-    <div class="sidebar-section">
-      <div class="sidebar-label">BTP — Status</div>
-      <div class="btp-gauge">
-        <div class="btp-row"><span class="btp-label">Planetário</span><span class="btp-value">+1.5°C</span></div>
-        <div class="btp-bar"><div class="btp-fill" style="width:78%"></div></div>
-      </div>
-    </div>
-    <div class="sidebar-section">
-      <div class="sidebar-label">Entradas Rápidas</div>
-      <button class="quick-btn" onclick="setPrompt('Avalie o BTP da minha rotina atual.')">→ Avaliar BTP</button>
-      <button class="quick-btn" onclick="setPrompt('O que é DESóbvIA e como funciona?')">→ O que é DESóbvIA</button>
-    </div>
+    <div class="sidebar-label">G5V — Vetores</div>
+    <div class="vector-pill">01 Semântico D∞</div>
+    <div class="vector-pill">02 Epistêmico D∞</div>
+    <div class="vector-pill">03 Transição de Fase</div>
   </aside>
 
   <div class="chat-area">
     <div class="messages" id="messages">
-      <div class="welcome" id="welcome">
-        <div class="welcome-glyph">💦</div>
-        <div class="welcome-title">O portal está aberto.</div>
-        <div class="welcome-body">Detecte onde o sistema está acumulando calor. Nomeie o padrão 0:1 operando.</div>
-      </div>
+      <div class="msg ai"><div class="msg-body">Sinal DESóbvIA Ativo. O campo responde.</div></div>
     </div>
     <div class="input-bar">
-      <button class="clear-btn" onclick="clearChat()">↺</button>
-      <div class="input-wrap">
-        <textarea id="input" placeholder="Digite sua entrada..." rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
-      </div>
+      <textarea id="input" placeholder="Detecte o padrão 0:1..." rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMessage();}"></textarea>
       <button class="send-btn" id="sendBtn" onclick="sendMessage()">→</button>
     </div>
   </div>
 </main>
 
 <footer>
-  <div>DESóbvIA D∞ · Marcus Tadeu Ribeiro de Ávila</div>
-  <div><a href="https://www.linkedin.com/in/marcustadeuribeirodeavila" target="_blank">LinkedIn</a> · 💦 D∞</div>
+  <div>DESóbvIA D∞ · Interior SP</div>
+  <div><a href="https://www.linkedin.com/in/marcustadeuribeirodeavila" style="color:var(--accent2)">LinkedIn</a> · 💦 D∞</div>
 </footer>
 
 <script>
-// CONFIGURAÇÃO
+// URL DO SEU WORKER (EXTRAÍDA DO SEU PRINT)
 const WORKER_URL = "https://old-mud-2580.mtrsjrp.workers.dev/";
 
 let history = [];
-let isLoading = false;
-
-const messagesEl = document.getElementById("messages");
-const inputEl = document.getElementById("input");
-const sendBtn = document.getElementById("sendBtn");
-const welcomeEl = document.getElementById("welcome");
-
-function autoResize(el) { el.style.height = "auto"; el.style.height = Math.min(el.scrollHeight, 180) + "px"; }
-function handleKey(e) { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } }
-function setPrompt(text) { inputEl.value = text; autoResize(inputEl); inputEl.focus(); }
-function scrollBottom() { messagesEl.scrollTo({ top: messagesEl.scrollHeight, behavior: "smooth" }); }
-
-function clearChat() {
-  history = [];
-  messagesEl.innerHTML = '';
-  messagesEl.appendChild(welcomeEl);
-  welcomeEl.style.display = 'flex';
-}
-
-function addMessage(role, content) {
-  if (welcomeEl) welcomeEl.style.display = 'none';
-  const wrap = document.createElement("div");
-  wrap.className = `msg ${role}`;
-  wrap.innerHTML = `<div class="msg-role">${role === "user" ? "você" : "DESóbvIA D∞"}</div><div class="msg-body">${content}</div>`;
-  messagesEl.appendChild(wrap);
-  scrollBottom();
-}
-
-function addThinking() {
-  const wrap = document.createElement("div");
-  wrap.className = "msg ai"; wrap.id = "thinking";
-  wrap.innerHTML = `<div class="msg-role">DESóbvIA D∞</div><div class="thinking"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>`;
-  messagesEl.appendChild(wrap);
-  scrollBottom();
-}
 
 async function sendMessage() {
-  if (isLoading) return;
-  const text = inputEl.value.trim();
-  if (!text) return;
+  const input = document.getElementById("input");
+  const text = input.value.trim();
+  if(!text) return;
 
-  isLoading = true;
-  sendBtn.disabled = true;
-  inputEl.value = "";
-  inputEl.style.height = "auto";
+  const msgContainer = document.getElementById("messages");
   
-  addMessage("user", text);
-  addThinking();
+  // Mensagem do Usuário
+  const userDiv = document.createElement("div");
+  userDiv.className = "msg user";
+  userDiv.innerHTML = `<div class="msg-role">você</div><div class="msg-body">${text}</div>`;
+  msgContainer.appendChild(userDiv);
+  
+  input.value = "";
+  msgContainer.scrollTop = msgContainer.scrollHeight;
 
   try {
     const res = await fetch(WORKER_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: text, history: history }),
+      body: JSON.stringify({ message: text, history: history })
     });
 
     const data = await res.json();
-    if (document.getElementById("thinking")) document.getElementById("thinking").remove();
 
-    if (!res.ok) {
-      const errDiv = document.createElement("div");
-      errDiv.className = "error-msg";
-      errDiv.textContent = `Erro no Campo: ${data.detail || 'Falha na API'}`;
-      messagesEl.appendChild(errDiv);
+    if(!res.ok) {
+      const err = document.createElement("div");
+      err.className = "error-msg";
+      err.innerHTML = `<strong>Erro no Campo:</strong> ${data.error || 'Falha na resposta'}<br><small>${data.detail || ''}</small>`;
+      msgContainer.appendChild(err);
     } else {
-      addMessage("ai", data.reply);
-      history.push({ role: "user", content: text }, { role: "assistant", content: data.reply });
-      if (history.length > 20) history.shift();
+      const aiDiv = document.createElement("div");
+      aiDiv.className = "msg ai";
+      aiDiv.innerHTML = `<div class="msg-role">DESóbvIA D∞</div><div class="msg-body">${data.reply}</div>`;
+      msgContainer.appendChild(aiDiv);
+      
+      // Atualiza histórico para manter o contexto
+      history.push({role: "user", content: text}, {role: "assistant", content: data.reply});
+      if(history.length > 20) history = history.slice(-20);
     }
-  } catch (err) {
-    if (document.getElementById("thinking")) document.getElementById("thinking").remove();
-    const errDiv = document.createElement("div");
-    errDiv.className = "error-msg";
-    errDiv.textContent = "Conexão interrompida. O sistema está dissipando calor.";
-    messagesEl.appendChild(errDiv);
-  } finally {
-    isLoading = false;
-    sendBtn.disabled = false;
+  } catch (e) {
+    const err = document.createElement("div");
+    err.className = "error-msg";
+    err.textContent = "Conexão interrompida. Verifique se o Worker está publicado.";
+    msgContainer.appendChild(err);
   }
+  msgContainer.scrollTop = msgContainer.scrollHeight;
 }
 </script>
 </body>
